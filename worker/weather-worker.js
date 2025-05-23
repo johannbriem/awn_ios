@@ -28,8 +28,8 @@ socket.on('data', (data) => {
   const payload = {
     timestamp: new Date().toISOString(),
     tempf: data.tempf,
-    windspeedmph: data.windspeedmph,
-    windgustmph: data.windgustmph,
+    windspeed: data.windspeedmph,
+    windgust: data.windgustmph,
     humidity: data.humidity,
     uv: data.uv,
     aqi_pm25: data.aqi_pm25,
