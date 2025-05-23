@@ -5,9 +5,11 @@ import { View, Text, StyleSheet } from 'react-native';
 export default function DetailsScreen() {
   // This screen is a placeholder for future details
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>📊 Trends Coming Soon...</Text>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Text style={styles.text}>📊 Trends Coming Soon...</Text>
+      </View>
+    </SafeAreaView>
   );
 }
 
