@@ -8,7 +8,7 @@ import { WeatherContext } from './WeatherContext'; // Assuming you have a Weathe
 export default function SettingsScreen() {
   const [appKey, setAppKey] = useState('');
   const [apiKey, setApiKey] = useState('');
-  const { unit, setUnit } = useContext(WeatherContext);
+  const { unit, setUnitAndSave } = useContext(WeatherContext);
   const isMetric = unit === 'metric';
 
   useEffect(() => {
@@ -26,14 +26,14 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.unitToggleRow}>
-        <Text style={styles.label}>Use Metric Units</Text>
-        <Switch
-          value={unit === 'metric'}
-          onValueChange={(value) => setUnitAndSave(value ? 'metric' : 'imperial')}
-        />
-      </View>
       <View style={styles.container}>
+        <View style={styles.unitToggleRow}>
+          <Text style={styles.label}>Use Metric Units</Text>
+          <Switch
+            value={isMetric}
+            onValueChange={(value) => setUnitAndSave(value ? 'metric' : 'imperial')}
+          />
+        </View>
         <Text style={styles.header}>🔐 API Key Setup</Text>
         <TextInput
           style={styles.input}
