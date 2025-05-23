@@ -1,14 +1,12 @@
-// weather-worker.js
 import { io } from 'socket.io-client';
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://supabase.com/dashboard/project/ahjxirfaryfpansbpjii';
-const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoanhpcmZhcnlmcGFuc2JwamlpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODAzMzM2NywiZXhwIjoyMDYzNjA5MzY3fQ.dG65TyOWd6XVjhu9-bnFuSeisOKVMlLjYRYjizzehWE';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const APP_KEY = process.env.APP_KEY;
+const API_KEY = process.env.API_KEY;
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-const APP_KEY = '66ea184d1e7b42009e69df31a647d56281ab7c8057df477782e4b912cc553d9a';
-const API_KEY = 'cddb83d67bcf46b8acee134f1102c62a8494c05d9d2647849746f158ec0222a2';
-
 let dataBuffer = [];
 
 // 1. Connect to AmbientWeather WebSocket
