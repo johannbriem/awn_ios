@@ -5,32 +5,61 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useContext } from 'react';
 import { WeatherContext } from './WeatherContext'; // Assuming you have a WeatherContext
 import { formatTemp, formatRain, formatSpeed } from './utils';
+import { saveKeys, loadKeys } from './storage'; // <- your helper file
 
 export default function MyApi() {
   const [weatherData, setWeatherData] = useState(null);
+  const [loadingMessage, setLoadingMessage] = useState('Loading weather data...');
+  const [errorMessage, setErrorMessage] = useState(null);
   const { unit } = useContext(WeatherContext);
+  const appKey = process.env.EXPO_PUBLIC_AMBIENT_APP_KEY;
+  const apiKey = process.env.EXPO_PUBLIC_AMBIENT_API_KEY;
 
   useEffect(() => {
+  let timeout;
+
+  (async () => {
+    const { appKey, apiKey, usedFallback } = await loadKeys();
+
+    if (!appKey || !apiKey) {
+      setErrorMessage('❗ No API keys found. Please enter them in Settings.');
+      return;
+    }
+
+    if (usedFallback) {
+      setLoadingMessage('Using fallback API keys...');
+    }
+
     const socket = io('https://rt2.ambientweather.net', {
       query: {
         api: '1',
-        applicationKey: '66ea184d1e7b42009e69df31a647d56281ab7c8057df477782e4b912cc553d9a',
+        applicationKey: appKey,
       },
       transports: ['websocket'],
     });
 
     socket.on('connect', () => {
-      socket.emit('subscribe', {
-        apiKeys: ['cddb83d67bcf46b8acee134f1102c62a8494c05d9d2647849746f158ec0222a2'],
-      });
+      socket.emit('subscribe', { apiKeys: [apiKey] });
+
+      // set a timeout in case no data is returned
+      timeout = setTimeout(() => {
+        setErrorMessage('⚠️ No data received from station. Check your keys.');
+        socket.disconnect();
+      }, 8000);
     });
 
     socket.on('data', (data) => {
+      clearTimeout(timeout);
       setWeatherData(data);
     });
 
-    return () => socket.disconnect();
-  }, []);
+    return () => {
+      clearTimeout(timeout);
+      socket.disconnect();
+    };
+  })();
+}, []);
+
 
   const toC = (f) => ((f - 32) * 5 / 9).toFixed(1);
 
@@ -51,11 +80,19 @@ export default function MyApi() {
     return { emoji, message };
   };
 
+  if (errorMessage) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>{errorMessage}</Text>
+      </View>
+    );
+  }
+
   if (!weatherData) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007aff" />
-        <Text style={styles.loadingText}>Loading weather...</Text>
+        <Text style={styles.loadingText}>{loadingMessage}</Text>
       </View>
     );
   }
@@ -164,4 +201,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
   },
+  errorText: {
+  color: 'red',
+  fontSize: 16,
+  textAlign: 'center',
+  padding: 20,
+},
 });
