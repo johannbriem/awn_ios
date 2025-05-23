@@ -6,6 +6,7 @@ import { useContext } from 'react';
 import { WeatherContext } from './WeatherContext'; // Assuming you have a WeatherContext
 import { formatTemp, formatRain, formatSpeed } from './utils';
 import { saveKeys, loadKeys } from './storage'; // <- your helper file
+import { timeAgo } from './utils';
 
 export default function MyApi() {
   const [weatherData, setWeatherData] = useState(null);
@@ -66,18 +67,17 @@ export default function MyApi() {
   const getWeatherSummary = () => {
     const uv = weatherData?.uv;
     const rain = weatherData?.hourlyrainin;
-    const emoji = uv >= 5 ? '😎' : rain > 0 ? '🌧️' : '🌤️';
-    let message = '';
+    const wind = weatherData?.windspeedmph ?? 0;
 
-    if (uv >= 6) {
-      message = "UV is high – sunscreen is your best friend!";
-    } else if (rain > 0) {
-      message = "Some rain coming in – might want an umbrella.";
-    } else {
-      message = "Looks like a great day ahead!";
-    }
-
-    return { emoji, message };
+    if (rain > 0.05) return { emoji: '🌧️', message: 'Rain expected soon. Grab a jacket!' };
+    if (uv >= 7) return { emoji: '😎', message: 'UV is high — sunscreen time!' };
+    if (wind > 20) return { emoji: '🌬️', message: 'Windy conditions today — hold your hat!' };
+    return { emoji: '🌤️', message: 'Looks like a great day ahead!' };
+  };
+  const triggerRefresh = () => {
+    setWeatherData(null);
+    setErrorMessage(null);
+    setLoadingMessage('Loading weather data...');
   };
   const triggerRefresh = () => {
     setWeatherData(null);
@@ -135,7 +135,7 @@ export default function MyApi() {
           <InfoTile label="Wind Gust" value={formatSpeed(weatherData.windgustmph || 'N/A', unit)} icon="🌬️" />
           <InfoTile label="UV Index" value={`${weatherData.uv}`} icon="☀️" />
           <InfoTile label="AQI PM2.5" value={`${weatherData.aqi_pm25}`} icon="🧪" />
-          <InfoTile label="Last Rain" value={new Date(weatherData.lastRain).toLocaleTimeString()} icon="🌧️" />
+          <InfoTile label="Last Rain" value={timeAgo(weatherData.lastRain)} icon="🌧️" />
           <InfoTile label="Today's Rain" value={formatRain(weatherData.hourlyrainin, unit)} icon="🌦️" />
         </View>
       </ScrollView>
