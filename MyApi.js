@@ -21,9 +21,6 @@ export default function MyApi() {
 
   (async () => {
     const { appKey, apiKey, usedFallback } = await loadKeys();
-    console.log('🔑 Loaded keys from storage:');
-    console.log(await loadKeys());
-
 
     if (!appKey || !apiKey) {
       setErrorMessage('❗ No API keys found. Please enter them in Settings.');
@@ -77,11 +74,25 @@ export default function MyApi() {
     if (wind > 20) return { emoji: '🌬️', message: 'Windy conditions today — hold your hat!' };
     return { emoji: '🌤️', message: 'Looks like a great day ahead!' };
   };
+  const triggerRefresh = () => {
+    setWeatherData(null);
+    setErrorMessage(null);
+    setLoadingMessage('Loading weather data...');
+  };
 
   if (errorMessage) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>{errorMessage}</Text>
+        <Text style={styles.errorText}>{errorMessage}</Text>
+        <Text style={styles.loadingText}>You can try again below.</Text>
+        <View style={{ marginTop: 20 }}>
+          <ActivityIndicator size="small" color="#007aff" />
+        </View>
+        <View style={{ marginTop: 30 }}>
+          <Text style={{ color: '#007aff', fontWeight: 'bold' }} onPress={triggerRefresh}>
+            🔄 Try Again
+          </Text>
+        </View>
       </View>
     );
   }

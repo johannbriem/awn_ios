@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const WeatherContext = createContext();
@@ -10,7 +10,9 @@ export const WeatherProvider = ({ children }) => {
   useEffect(() => {
     (async () => {
       const storedUnit = await AsyncStorage.getItem('unitPreference');
-      if (storedUnit) setUnit(storedUnit);
+      if (storedUnit) {
+        setUnit(storedUnit);
+      }
     })();
   }, []);
 
@@ -22,7 +24,7 @@ export const WeatherProvider = ({ children }) => {
   const triggerRefresh = () => setRefreshKey(prev => prev + 1);
 
   return (
-    <WeatherContext.Provider value={{ unit, setUnit: setUnitAndSave, refreshKey, triggerRefresh }}>
+    <WeatherContext.Provider value={{ unit, setUnitAndSave, refreshKey, triggerRefresh }}>
       {children}
     </WeatherContext.Provider>
   );
