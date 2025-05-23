@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useContext } from 'react';
 import { WeatherContext } from './WeatherContext'; // Assuming you have a WeatherContext
+import { formatTemp, formatRain, formatSpeed } from './utils';
 
 export default function MyApi() {
   const [weatherData, setWeatherData] = useState(null);
@@ -72,14 +73,18 @@ export default function MyApi() {
 
         {/* Info Tiles */}
         <View style={styles.grid}>
-          <InfoTile label="Temperature" value={`${weatherData.tempf} °F / ${toC(weatherData.tempf)} °C`} icon="🌡️" />
+          <InfoTile 
+            label="Temperature"
+            icon="🌡️"
+            value={formatTemp(weatherData.tempf, unit)}
+          />
           <InfoTile label="Humidity" value={`${weatherData.humidity}%`} icon="💧" />
-          <InfoTile label="Wind Speed" value={`${weatherData.windspeedmph} mph`} icon="💨" />
-          <InfoTile label="Wind Gust" value={`${weatherData.windgustmph || 'N/A'} mph`} icon="🌬️" />
+          <InfoTile label="Wind Speed" value={formatSpeed(weatherData.windspeedmph, unit)} icon="💨" />
+          <InfoTile label="Wind Gust" value={formatSpeed(weatherData.windgustmph || 'N/A', unit)} icon="🌬️" />
           <InfoTile label="UV Index" value={`${weatherData.uv}`} icon="☀️" />
           <InfoTile label="AQI PM2.5" value={`${weatherData.aqi_pm25}`} icon="🧪" />
           <InfoTile label="Last Rain" value={new Date(weatherData.lastRain).toLocaleTimeString()} icon="🌧️" />
-          <InfoTile label="Today's Rain" value={`${weatherData.hourlyrainin}"`} icon="🌦️" />
+          <InfoTile label="Today's Rain" value={formatRain(weatherData.hourlyrainin, unit)} icon="🌦️" />
         </View>
       </ScrollView>
     </SafeAreaView>
