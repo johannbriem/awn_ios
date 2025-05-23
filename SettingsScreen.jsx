@@ -26,11 +26,11 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.row}>
+      <View style={styles.unitToggleRow}>
         <Text style={styles.label}>Use Metric Units</Text>
         <Switch
-          value={isMetric}
-          onValueChange={() => setUnit(isMetric ? 'imperial' : 'metric')}
+          value={unit === 'metric'}
+          onValueChange={(value) => setUnitAndSave(value ? 'metric' : 'imperial')}
         />
       </View>
       <View style={styles.container}>
@@ -40,12 +40,14 @@ export default function SettingsScreen() {
           placeholder="Ambient App Key"
           value={appKey}
           onChangeText={setAppKey}
+          secureTextEntry={appKey.length > 10}
         />
         <TextInput
           style={styles.input}
           placeholder="Ambient API Key"
           value={apiKey}
           onChangeText={setApiKey}
+          secureTextEntry={apiKey.length > 10}
         />
         <Button title="Save Keys" onPress={handleSave} />
         <Text style={styles.help}>Need help? Tap here for setup guide (coming soon)</Text>
@@ -64,5 +66,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: '#007aff',
     textDecorationLine: 'underline',
-  }
+  },
+  unitToggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
 });

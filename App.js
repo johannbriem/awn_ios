@@ -6,6 +6,7 @@ import DetailsScreen from './DetailsScreen';
 import TrendsScreen from './TrendsScreen';
 import SettingsScreen from './SettingsScreen';
 import { WeatherProvider } from './WeatherContext';
+import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -20,10 +21,46 @@ export default function App() {
             tabBarLabelStyle: { fontSize: 12 },
           }}
         >
-          <Tab.Screen name="Home" component={MyApi} />
-          <Tab.Screen name="Details" component={DetailsScreen} />
-          <Tab.Screen name="Trends" component={TrendsScreen} />
-          <Tab.Screen name="Settings" component={SettingsScreen} />
+          <Tab.Screen 
+            name="Home" 
+            component={MyApi}
+            options={{
+              tabBarLabel: 'Home',
+              tabBarIcon: ({ color }) => (
+                <Ionicons name="home" size={24} color={color} />
+              ),
+            }}
+          />
+          <Tab.Screen 
+            name="Details" 
+            component={DetailsScreen} 
+            options={{
+              tabBarLabel: 'Details',
+              tabBarIcon: ({ color }) => (
+                <Ionicons name="information-circle" size={24} color={color} />
+              ),
+            }}
+          />
+          <Tab.Screen 
+            name="Trends" 
+            component={TrendsScreen} 
+            options={{
+              tabBarLabel: 'Trends',
+              tabBarIcon: ({ color }) => (
+                <Ionicons name="bar-chart" size={24} color={color} />
+              ),
+            }}
+          />
+          <Tab.Screen 
+            name="Settings" 
+            component={SettingsScreen} 
+            options={{
+              tabBarLabel: 'Settings',
+              tabBarIcon: ({ color }) => (
+                <Ionicons name="settings" size={24} color={color} />
+              ),
+            }}
+          />
         </Tab.Navigator>
       </NavigationContainer>
     </WeatherProvider>
