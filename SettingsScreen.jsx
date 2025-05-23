@@ -1,22 +1,25 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Switch } from 'react-native';
 import { WeatherContext } from './WeatherContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const { unit, setUnit } = useContext(WeatherContext);
   const isMetric = unit === 'metric';
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>⚙️ Settings</Text>
-      <View style={styles.row}>
-        <Text style={styles.label}>Use Metric Units</Text>
-        <Switch
-          value={isMetric}
-          onValueChange={() => setUnit(isMetric ? 'imperial' : 'metric')}
-        />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Text style={styles.header}>⚙️ Settings</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Use Metric Units</Text>
+          <Switch
+            value={isMetric}
+            onValueChange={() => setUnit(isMetric ? 'imperial' : 'metric')}
+          />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
