@@ -20,6 +20,9 @@ export default function MyApi() {
 
   (async () => {
     const { appKey, apiKey, usedFallback } = await loadKeys();
+    console.log('🔑 Loaded keys from storage:');
+    console.log(await loadKeys());
+
 
     if (!appKey || !apiKey) {
       setErrorMessage('❗ No API keys found. Please enter them in Settings.');
@@ -45,7 +48,7 @@ export default function MyApi() {
       timeout = setTimeout(() => {
         setErrorMessage('⚠️ No data received from station. Check your keys.');
         socket.disconnect();
-      }, 8000);
+      }, 30000);
     });
 
     socket.on('data', (data) => {
