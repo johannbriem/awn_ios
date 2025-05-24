@@ -8,6 +8,7 @@ on:
 jobs:
   weather-upload:
     runs-on: ubuntu-latest
+    environment: Weather Sync
 
     steps:
       - name: Checkout repo
