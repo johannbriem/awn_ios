@@ -9,7 +9,7 @@ const API_KEY = process.env.API_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-function waitForSocketData(timeoutMs = 10000) {
+function waitForSocketData(timeoutMs = 30000) {
   return new Promise((resolve, reject) => {
     const socket = io('https://rt2.ambientweather.net', {
       query: { api: '1', applicationKey: APP_KEY },
