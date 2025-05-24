@@ -23,7 +23,7 @@ jobs:
         working-directory: ./worker
 
       - name: Run weather sync
-        run: node weather-worker.js
+        run: node weather-worker.mjs
         working-directory: ./worker
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
