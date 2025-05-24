@@ -1,3 +1,4 @@
+// worker/weather-worker.js
 import { io } from 'socket.io-client';
 import { createClient } from '@supabase/supabase-js';
 
@@ -7,51 +8,50 @@ const APP_KEY = process.env.APP_KEY;
 const API_KEY = process.env.API_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-let dataBuffer = [];
 
-// 1. Connect to AmbientWeather WebSocket
-const socket = io('https://rt2.ambientweather.net', {
-  query: {
-    api: '1',
-    applicationKey: APP_KEY,
-  },
-  transports: ['websocket'],
-});
+function waitForSocketData(timeoutMs = 10000) {
+  return new Promise((resolve, reject) => {
+    const socket = io('https://rt2.ambientweather.net', {
+      query: { api: '1', applicationKey: APP_KEY },
+      transports: ['websocket'],
+    });
 
-socket.on('connect', () => {
-  console.log('✅ Connected to AmbientWeather');
-  socket.emit('subscribe', { apiKeys: [API_KEY] });
-});
+    let resolved = false;
 
-// 2. Store data every ~30s
-socket.on('data', (data) => {
-  const payload = {
-    timestamp: new Date().toISOString(),
-    tempf: data.tempf,
-    windspeed: data.windspeedmph,
-    windgust: data.windgustmph,
-    humidity: data.humidity,
-    uv: data.uv,
-    aqi_pm25: data.aqi_pm25,
-    hourlyrainin: data.hourlyrainin,
-    lastRain: data.lastRain,
-  };
+    socket.on('connect', () => {
+      socket.emit('subscribe', { apiKeys: [API_KEY] });
+    });
 
-  console.log(`📥 Buffered at ${payload.timestamp}`);
-  dataBuffer.push(payload);
-});
+    socket.on('data', async (data) => {
+      resolved = true;
+      const payload = {
+        timestamp: new Date().toISOString(),
+        tempf: data.tempf,
+        windspeedmph: data.windspeedmph,
+        windgustmph: data.windgustmph,
+        humidity: data.humidity,
+        uv: data.uv,
+        aqi_pm25: data.aqi_pm25,
+        hourlyrainin: data.hourlyrainin,
+        lastRain: data.lastRain,
+      };
+      await supabase.from('weather_data').insert([payload]);
+      socket.disconnect();
+      resolve();
+    });
 
-// 3. Flush buffer every 10 minutes
-setInterval(async () => {
-  if (dataBuffer.length === 0) return;
+    setTimeout(() => {
+      if (!resolved) {
+        socket.disconnect();
+        reject('Timed out waiting for AmbientWeather data.');
+      }
+    }, timeoutMs);
+  });
+}
 
-  console.log(`📤 Uploading ${dataBuffer.length} records to Supabase...`);
-
-  const { error } = await supabase.from('weather_data').insert(dataBuffer);
-  if (error) {
-    console.error('❗ Error uploading:', error.message);
-  } else {
-    console.log('✅ Uploaded.');
-    dataBuffer = [];
-  }
-}, 10 * 60 * 1000); // every 10 minutes
+waitForSocketData()
+  .then(() => console.log('✅ Data sent to Supabase'))
+  .catch((err) => {
+    console.error('❌ Error:', err);
+    process.exit(1);
+  });
